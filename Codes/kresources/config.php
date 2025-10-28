@@ -5,6 +5,33 @@ ob_start();
 session_start();
 
 
+// define replacement callback (safe: only if not already defined)
+if (!function_exists('replace_currency')) {
+    /**
+     * Replace Yen symbols/entities with the Indian Rupee symbol in final output.
+     * Runs on the output buffer so templates and data don't need editing.
+     */
+    function replace_currency($buffer) {
+        $search = [
+            '¥',        // literal Yen sign
+            '&yen;',    // HTML entity (named)
+            '&#165;',   // decimal numeric entity for ¥
+            '&#x00A5;'  // hex numeric entity for ¥
+        ];
+        $replace = [
+            '₹',        // literal Rupee sign
+            '&#8377;',  // HTML numeric entity for ₹
+            '&#8377;',
+            '&#8377;'
+        ];
+        return str_replace($search, $replace, $buffer);
+    }
+}
+
+// start output buffering with the replacement callback
+ob_start('replace_currency');
+
+
 
 //************************************************************************
 //(i)session ending "by the way there are predefined in the system" 
